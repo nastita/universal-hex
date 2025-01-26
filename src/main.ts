@@ -7,7 +7,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Universal HEX')
-    .setDescription('The Hibrid Exchange for Universal Assets')
+    .setDescription('The Hybrid Exchange for Universal Assets')
     .setVersion('1.0')
     .addTag('universal')
     .build();
