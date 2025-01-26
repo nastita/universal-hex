@@ -1,0 +1,44 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Chain {
+  id        Int          @id @default(autoincrement())
+  name      String       @unique
+  assets    AssetChain[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@map("chains")
+}
+
+model Asset {
+  id              Int          @id @default(autoincrement())
+  name            String       @unique
+  symbol          String       @unique
+  contractAddress String       @unique
+  chains          AssetChain[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@map("assets")
+}
+
+model AssetChain {
+  asset     Asset    @relation(fields: [assetId], references: [id])
+  assetId   Int
+  chain     Chain    @relation(fields: [chainId], references: [id])
+  chainId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([assetId, chainId])
+  @@map("assets_chains")
+}
