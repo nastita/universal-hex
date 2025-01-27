@@ -5,7 +5,7 @@ import {
   createTheGraphSubgraphUrl,
 } from '../libs/indexes/the-graph/constants';
 import {
-  createTokensQuery,
+  getTokensQuery,
   TokensQueryResponse,
 } from '../libs/indexes/the-graph/tokens';
 import { AssetsRepository } from '../libs/data/interfaces/assets.repository.interface';
@@ -28,22 +28,39 @@ export class AssetsService {
     );
   }
 
-  async getAssetsData(): Promise<AssetDataDto[]> {
+  async getAssetsData(startDate?: number): Promise<AssetDataDto[]> {
     const assets = await this.assetsRepository.getAssets();
     const assetsAddresses = assets.map((asset) =>
       asset.contractAddress.toLocaleLowerCase(),
     );
-    const query = createTokensQuery(assetsAddresses);
-    this.logger.debug(`Querying assets from The Graph, query: ${query}`);
-    const response = await request<TokensQueryResponse>(this.apiUrl, query);
+    this.logger.debug(
+      `Querying assets from The Graph for addresses: ${assetsAddresses.join(', ')}`,
+    );
+    const response = await request<TokensQueryResponse>(
+      this.apiUrl,
+      getTokensQuery,
+      {
+        contractAddresses: assetsAddresses,
+        startDate: startDate || null,
+        skipTokenDayData: !startDate,
+      },
+    );
 
     return response?.tokens || [];
   }
 
-  async getAssetData(contractAddress: string): Promise<AssetDataDto | null> {
+  async getAssetData(
+    contractAddress: string,
+    startDate?: number,
+  ): Promise<AssetDataDto | null> {
     const response = await request<TokensQueryResponse>(
       this.apiUrl,
-      createTokensQuery([contractAddress]),
+      getTokensQuery,
+      {
+        contractAddresses: [contractAddress],
+        startDate: startDate || null,
+        skipTokenDayData: !startDate,
+      },
     );
 
     return response?.tokens?.[0] || null;

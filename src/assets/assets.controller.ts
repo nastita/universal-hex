@@ -1,7 +1,18 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { AssetsService } from './assets.service';
-import { TokenData } from '../libs/indexes/the-graph/tokens';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AssetDataDto } from './assets.dto';
 
 @ApiTags('assets')
@@ -14,6 +25,12 @@ export class AssetsController {
     description:
       'Retrieves a list of all available assets with their data from The Graph',
   })
+  @ApiQuery({
+    name: 'startDate',
+    required: false,
+    type: Number,
+    description: 'Unix timestamp to start fetching token day data from',
+  })
   @ApiResponse({
     status: 200,
     description: 'List of assets retrieved successfully',
@@ -21,8 +38,10 @@ export class AssetsController {
     isArray: true,
   })
   @Get()
-  async getAssets(): Promise<TokenData[]> {
-    return await this.assetsService.getAssetsData();
+  async getAssets(
+    @Query('startDate') startDate?: number,
+  ): Promise<AssetDataDto[]> {
+    return await this.assetsService.getAssetsData(startDate);
   }
 
   @ApiOperation({
@@ -34,6 +53,12 @@ export class AssetsController {
     description: 'The contract address of the asset',
     example: '0x12e96c2bfea6e835cf8dd38a5834fa61cf723736',
   })
+  @ApiQuery({
+    name: 'startDate',
+    required: false,
+    type: Number,
+    description: 'Unix timestamp to start fetching token day data from',
+  })
   @ApiResponse({
     status: 200,
     description: 'Asset data retrieved successfully',
@@ -43,8 +68,12 @@ export class AssetsController {
   @Get(':contractAddress')
   async getAsset(
     @Param('contractAddress') contractAddress: string,
+    @Query('startDate') startDate?: number,
   ): Promise<AssetDataDto | null> {
-    const asset = await this.assetsService.getAssetData(contractAddress);
+    const asset = await this.assetsService.getAssetData(
+      contractAddress,
+      startDate,
+    );
 
     if (!asset) throw new NotFoundException('Asset not found');
 

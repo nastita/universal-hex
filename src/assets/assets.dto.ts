@@ -1,5 +1,85 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export class TokenDayDataDto {
+  @ApiProperty({
+    description: 'Date of the token data',
+    example: '1706227200',
+  })
+  date: string;
+
+  @ApiProperty({
+    description: 'Closing price for the day',
+    example: '0.345',
+  })
+  close: string;
+
+  @ApiProperty({
+    description: 'Total fees collected in USD',
+    example: '1234.56',
+  })
+  feesUSD: string;
+
+  @ApiProperty({
+    description: 'Highest price for the day',
+    example: '0.367',
+  })
+  high: string;
+
+  @ApiProperty({
+    description: 'Unique identifier',
+    example: '0x12e96c2bfea6e835cf8dd38a5834fa61cf723736-1706227200',
+  })
+  id: string;
+
+  @ApiProperty({
+    description: 'Lowest price for the day',
+    example: '0.332',
+  })
+  low: string;
+
+  @ApiProperty({
+    description: 'Opening price for the day',
+    example: '0.340',
+  })
+  open: string;
+
+  @ApiProperty({
+    description: 'Current price in USD',
+    example: '0.345',
+  })
+  priceUSD: string;
+
+  @ApiProperty({
+    description: 'Total value locked',
+    example: '497889.871649120987730964',
+  })
+  totalValueLocked: string;
+
+  @ApiProperty({
+    description: 'Total value locked in USD',
+    example: '171833.6927592904025798520789977834',
+  })
+  totalValueLockedUSD: string;
+
+  @ApiProperty({
+    description: 'Untracked volume in USD',
+    example: '12345.67',
+  })
+  untrackedVolumeUSD: string;
+
+  @ApiProperty({
+    description: 'Trading volume',
+    example: '15000.50',
+  })
+  volume: string;
+
+  @ApiProperty({
+    description: 'Trading volume in USD',
+    example: '15000.50',
+  })
+  volumeUSD: string;
+}
+
 export class AssetDataDto {
   @ApiProperty({
     description: 'Number of decimal places for the token',
@@ -50,20 +130,27 @@ export class AssetDataDto {
   totalValueLockedUSD: string;
 
   @ApiProperty({
-    description: 'Total number of transactions involving this token',
-    example: '82251',
+    description: 'Total number of transactions',
+    example: '150',
   })
   txCount: string;
 
   @ApiProperty({
-    description: 'Total trading volume of the token',
-    example: '120885944.839253248164506582',
+    description: 'Total trading volume',
+    example: '1500000.50',
   })
   volume: string;
 
   @ApiProperty({
     description: 'Total trading volume in USD',
-    example: '42756462.6853263813307613775208913',
+    example: '1500000.50',
   })
   volumeUSD: string;
+
+  @ApiProperty({
+    description: 'Historical daily data for the token',
+    type: [TokenDayDataDto],
+    required: false,
+  })
+  tokenDayData?: TokenDayDataDto[];
 }
