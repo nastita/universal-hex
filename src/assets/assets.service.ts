@@ -28,41 +28,72 @@ export class AssetsService {
     );
   }
 
-  async getAssetsData(startDate?: number): Promise<AssetDataDto[]> {
+  async getAssetsData(): Promise<AssetDataDto[]> {
     const assets = await this.assetsRepository.getAssets();
-    const assetsAddresses = assets.map((asset) =>
+    const contractAddresses = assets.map((asset) =>
       asset.contractAddress.toLocaleLowerCase(),
     );
+    const now = Math.floor(Date.now() / 1000);
+    const timestampHourAgo = now - 3600;
+    const timestamp24hAgo = now - 24 * 60 * 60;
+    const timestamp25hAgo = now - 25 * 60 * 60;
+
     this.logger.debug(
-      `Querying assets from The Graph for addresses: ${assetsAddresses.join(', ')}`,
+      `Querying assets from The Graph for addresses: ${contractAddresses.join(', ')}`,
     );
+
     const response = await request<TokensQueryResponse>(
       this.apiUrl,
       getTokensQuery,
       {
-        contractAddresses: assetsAddresses,
-        startDate: startDate || null,
-        skipTokenDayData: !startDate,
+        contractAddresses,
+        timestampHourAgo,
+        timestamp24hAgo,
+        timestamp25hAgo,
       },
     );
 
-    return response?.tokens || [];
-  }
-
-  async getAssetData(
-    contractAddress: string,
-    startDate?: number,
-  ): Promise<AssetDataDto | null> {
-    const response = await request<TokensQueryResponse>(
-      this.apiUrl,
-      getTokensQuery,
-      {
-        contractAddresses: [contractAddress],
-        startDate: startDate || null,
-        skipTokenDayData: !startDate,
-      },
+    this.logger.debug(
+      `Received response from The Graph: ${JSON.stringify(response)}`,
     );
 
-    return response?.tokens?.[0] || null;
+    const { tokens, currentHourDatas, dayOldTokenHourDatas } = response;
+
+    const assetsData = assets.map((asset) => {
+      const token = tokens.find(
+        (token) =>
+          token.id.toLowerCase() === asset.contractAddress.toLowerCase(),
+      );
+
+      const currentTokenHourDataPrice = currentHourDatas.find(
+        (tokenHourData) =>
+          tokenHourData.token?.id.toLowerCase() ===
+          asset.contractAddress.toLowerCase(),
+      )?.priceUSD;
+
+      const dayOldTokenHourDataPrice = dayOldTokenHourDatas.find(
+        (tokenHourData) =>
+          tokenHourData.token?.id.toLowerCase() ===
+          asset.contractAddress.toLowerCase(),
+      )?.priceUSD;
+
+      if (!token || !currentTokenHourDataPrice || !dayOldTokenHourDataPrice) {
+        return;
+      }
+
+      const assetData: AssetDataDto = {
+        ...token,
+        priceChangePercentage24h: (
+          ((parseFloat(currentTokenHourDataPrice) -
+            parseFloat(dayOldTokenHourDataPrice)) /
+            parseFloat(dayOldTokenHourDataPrice)) *
+          100
+        ).toString(),
+      };
+
+      return assetData;
+    });
+
+    return assetsData.filter((assetData) => assetData !== undefined);
   }
 }

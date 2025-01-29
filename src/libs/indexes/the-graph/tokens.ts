@@ -31,15 +31,26 @@ export interface TokenData {
   tokenDayData?: TokenDayData[];
 }
 
+export interface TokenHourData {
+  periodStartUnix: string;
+  priceUSD: string;
+  token: {
+    id: string;
+  };
+}
+
 export interface TokensQueryResponse {
   tokens: TokenData[];
+  currentHourDatas: TokenHourData[];
+  dayOldTokenHourDatas: TokenHourData[];
 }
 
 export const getTokensQuery = gql`
   query getTokens(
     $contractAddresses: [String!]!
-    $startDate: Int
-    $skipTokenDayData: Boolean!
+    $timestamp24hAgo: Int!
+    $timestamp25hAgo: Int!
+    $timestampHourAgo: Int!
   ) {
     tokens(where: { id_in: $contractAddresses }) {
       decimals
@@ -53,21 +64,34 @@ export const getTokensQuery = gql`
       txCount
       volume
       volumeUSD
-      tokenDayData(orderDirection: asc, where: { date_gte: $startDate })
-        @skip(if: $skipTokenDayData) {
-        date
-        close
-        feesUSD
-        high
+    }
+    currentHourDatas: tokenHourDatas(
+      orderBy: periodStartUnix
+      orderDirection: desc
+      where: {
+        token_in: $contractAddresses
+        periodStartUnix_gte: $timestampHourAgo
+      }
+    ) {
+      periodStartUnix
+      priceUSD
+      token {
         id
-        low
-        open
-        priceUSD
-        totalValueLocked
-        totalValueLockedUSD
-        untrackedVolumeUSD
-        volume
-        volumeUSD
+      }
+    }
+    dayOldTokenHourDatas: tokenHourDatas(
+      orderBy: periodStartUnix
+      orderDirection: desc
+      where: {
+        token_in: $contractAddresses
+        periodStartUnix_lte: $timestamp24hAgo
+        periodStartUnix_gte: $timestamp25hAgo
+      }
+    ) {
+      periodStartUnix
+      priceUSD
+      token {
+        id
       }
     }
   }

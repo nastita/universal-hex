@@ -148,9 +148,8 @@ export class AssetDataDto {
   volumeUSD: string;
 
   @ApiProperty({
-    description: 'Historical daily data for the token',
-    type: [TokenDayDataDto],
-    required: false,
+    description: '24-hour price change percentage',
+    example: '5.67',
   })
-  tokenDayData?: TokenDayDataDto[];
+  priceChangePercentage24h: string;
 }
