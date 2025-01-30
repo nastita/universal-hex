@@ -92,6 +92,9 @@ export class AssetsService {
 
       const assetData: AssetDataWithPriceInfoDto = {
         ...token,
+        icon: asset.iconUrl ?? undefined,
+        description: asset.description ?? undefined,
+        links: asset.links,
         priceUSD: currentTokenHourDataPrice,
         priceChangePercentage24h: (
           ((parseFloat(currentTokenHourDataPrice) -

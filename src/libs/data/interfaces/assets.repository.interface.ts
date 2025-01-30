@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { Asset } from '@prisma/client';
+import { Asset, AssetLink } from '@prisma/client';
+
+export interface AssetWithLinks extends Asset {
+  links?: AssetLink[];
+}
 
 @Injectable()
 export abstract class AssetsRepository {
-  abstract getAssets(): Promise<Asset[]>;
+  abstract getAssets(): Promise<AssetWithLinks[]>;
 }

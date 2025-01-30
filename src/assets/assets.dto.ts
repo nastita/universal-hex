@@ -1,5 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export class AssetLinkDto {
+  @ApiProperty({
+    description: 'Name of the link',
+    example: 'website',
+  })
+  name: string;
+
+  @ApiProperty({
+    description: 'URL of the link',
+    example: 'https://example.com',
+  })
+  url: string;
+}
+
 export class AssetDataDto {
   @ApiProperty({
     description: 'Number of decimal places for the token',
@@ -50,6 +64,27 @@ export class AssetDataDto {
   totalValueLockedUSD: string;
 
   @ApiProperty({
+    description: 'Description of the token',
+    example: 'A decentralized token for the community',
+    required: false,
+  })
+  description?: string;
+
+  @ApiProperty({
+    description: 'URL of the token icon',
+    example: 'https://example.com/icon.png',
+    required: false,
+  })
+  icon?: string;
+
+  @ApiProperty({
+    description: 'Related links for the token',
+    type: [AssetLinkDto],
+    required: false,
+  })
+  links?: AssetLinkDto[];
+
+  @ApiProperty({
     description: 'Total number of transactions',
     example: '150',
   })
@@ -68,7 +103,12 @@ export class AssetDataDto {
   volumeUSD: string;
 }
 
-export class AssetDataWithPriceChangeDto extends AssetDataDto {
+export class AssetDataWithPriceInfoDto extends AssetDataDto {
+  @ApiProperty({
+    description: 'Current price of the asset in USD',
+    example: '0.324156',
+  })
+  priceUSD: string;
   @ApiProperty({
     description: '24-hour price change percentage',
     example: '5.67',

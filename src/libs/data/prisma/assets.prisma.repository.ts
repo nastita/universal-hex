@@ -1,12 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { AssetsRepository } from '../interfaces/assets.repository.interface';
+import {
+  AssetsRepository,
+  AssetWithLinks,
+} from '../interfaces/assets.repository.interface';
 import { PrismaService } from './prisma.service';
 
 @Injectable()
 export class AssetsPrismaRepository implements AssetsRepository {
   constructor(private prisma: PrismaService) {}
 
-  async getAssets() {
-    return this.prisma.asset.findMany();
+  async getAssets(): Promise<AssetWithLinks[]> {
+    return this.prisma.asset.findMany({
+      include: {
+        links: true,
+      },
+    });
   }
 }

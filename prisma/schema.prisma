@@ -24,11 +24,26 @@ model Asset {
   name            String       @unique
   symbol          String       @unique
   contractAddress String       @unique
+  description     String?
   chains          AssetChain[]
+  iconUrl         String?
+  links           AssetLink[]
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
   @@map("assets")
+}
+
+model AssetLink {
+  id        Int      @id @default(autoincrement())
+  name      String
+  url       String
+  asset     Asset    @relation(fields: [assetId], references: [id])
+  assetId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("asset_links")
 }
 
 model AssetChain {
