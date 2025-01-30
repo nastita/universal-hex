@@ -1,50 +1,5 @@
 import { gql } from 'graphql-request';
 
-export interface TokenDayData {
-  date: string;
-  close: string;
-  feesUSD: string;
-  high: string;
-  id: string;
-  low: string;
-  open: string;
-  priceUSD: string;
-  totalValueLocked: string;
-  totalValueLockedUSD: string;
-  untrackedVolumeUSD: string;
-  volume: string;
-  volumeUSD: string;
-}
-
-export interface TokenData {
-  decimals: string;
-  id: string;
-  name: string;
-  poolCount: string;
-  symbol: string;
-  totalSupply: string;
-  totalValueLocked: string;
-  totalValueLockedUSD: string;
-  txCount: string;
-  volume: string;
-  volumeUSD: string;
-  tokenDayData?: TokenDayData[];
-}
-
-export interface TokenHourData {
-  periodStartUnix: string;
-  priceUSD: string;
-  token: {
-    id: string;
-  };
-}
-
-export interface TokensQueryResponse {
-  tokens: TokenData[];
-  currentHourDatas: TokenHourData[];
-  dayOldTokenHourDatas: TokenHourData[];
-}
-
 export const getTokensQuery = gql`
   query getTokens(
     $contractAddresses: [String!]!
@@ -93,6 +48,60 @@ export const getTokensQuery = gql`
       token {
         id
       }
+    }
+  }
+`;
+
+export const getTokenWith24hTokenHourDatasQuery = gql`
+  query getToken($contractAddress: String!) {
+    token(id: $contractAddress) {
+      decimals
+      id
+      name
+      poolCount
+      symbol
+      totalSupply
+      totalValueLocked
+      totalValueLockedUSD
+      txCount
+      volume
+      volumeUSD
+    }
+    priceDataPoints: tokenHourDatas(
+      first: 24
+      orderBy: periodStartUnix
+      orderDirection: desc
+      where: { token: $contractAddress }
+    ) {
+      periodStartUnix
+      priceUSD
+    }
+  }
+`;
+
+export const getTokenWithTokenDayDatasQuery = gql`
+  query getToken($contractAddress: String!, $numberOfDays: Int!) {
+    token(id: $contractAddress) {
+      decimals
+      id
+      name
+      poolCount
+      symbol
+      totalSupply
+      totalValueLocked
+      totalValueLockedUSD
+      txCount
+      volume
+      volumeUSD
+    }
+    priceDataPoints: tokenDayDatas(
+      first: $numberOfDays
+      orderBy: date
+      orderDirection: desc
+      where: { token: $contractAddress }
+    ) {
+      date
+      priceUSD
     }
   }
 `;
