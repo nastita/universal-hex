@@ -13,7 +13,11 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { AssetDataDto, AssetWithPriceDataPoints } from './assets.dto';
+import {
+  AssetDataDto,
+  AssetDataWithPriceInfoDto,
+  AssetWithPriceDataPoints,
+} from './assets.dto';
 
 @ApiTags('assets')
 @Controller('assets')
@@ -32,7 +36,7 @@ export class AssetsController {
     isArray: true,
   })
   @Get()
-  async getAssets(): Promise<AssetDataDto[]> {
+  async getAssets(): Promise<AssetDataWithPriceInfoDto[]> {
     return await this.assetsService.getAssetsData();
   }
 

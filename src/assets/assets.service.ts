@@ -13,8 +13,7 @@ import { AssetsRepository } from '../libs/data/interfaces/assets.repository.inte
 import { ConfigService } from '@nestjs/config';
 import { LoggerService } from '../libs/logger/logger.service';
 import {
-  AssetDataDto,
-  AssetDataWithPriceChangeDto,
+  AssetDataWithPriceInfoDto,
   AssetWithPriceDataPoints,
 } from './assets.dto';
 import {
@@ -38,7 +37,7 @@ export class AssetsService {
     );
   }
 
-  async getAssetsData(): Promise<AssetDataDto[]> {
+  async getAssetsData(): Promise<AssetDataWithPriceInfoDto[]> {
     const assets = await this.assetsRepository.getAssets();
     const contractAddresses = assets.map((asset) =>
       asset.contractAddress.toLocaleLowerCase(),
@@ -91,8 +90,9 @@ export class AssetsService {
         return;
       }
 
-      const assetData: AssetDataWithPriceChangeDto = {
+      const assetData: AssetDataWithPriceInfoDto = {
         ...token,
+        priceUSD: currentTokenHourDataPrice,
         priceChangePercentage24h: (
           ((parseFloat(currentTokenHourDataPrice) -
             parseFloat(dayOldTokenHourDataPrice)) /
