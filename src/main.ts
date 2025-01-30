@@ -13,14 +13,14 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Universal HEX')
-    .setDescription('The Hybrid Exchange for Universal Assets')
+    .setTitle('Universal HEX API')
+    .setDescription('API for the Hybrid Exchange for Universal Assets')
     .setVersion('1.0')
     .addTag('universal')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 8080);
 }
 bootstrap();
