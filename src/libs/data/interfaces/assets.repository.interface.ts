@@ -8,4 +8,7 @@ export interface AssetWithLinks extends Asset {
 @Injectable()
 export abstract class AssetsRepository {
   abstract getAssets(): Promise<AssetWithLinks[]>;
+  abstract getAssetByAddress(
+    contractAddress: string,
+  ): Promise<AssetWithLinks | null>;
 }

@@ -73,16 +73,8 @@ export class AssetDataDto {
   @ApiProperty({
     description: 'URL of the token icon',
     example: 'https://example.com/icon.png',
-    required: false,
   })
   icon?: string;
-
-  @ApiProperty({
-    description: 'Related links for the token',
-    type: [AssetLinkDto],
-    required: false,
-  })
-  links?: AssetLinkDto[];
 
   @ApiProperty({
     description: 'Total number of transactions',
@@ -130,7 +122,19 @@ export class PriceDataPoint {
   priceUSD: string;
 }
 
-export class AssetWithPriceDataPoints extends AssetDataDto {
+export class AssetDataExtrasDto extends AssetDataDto {
+  @ApiProperty({
+    description: 'Description of the token',
+    example: 'A decentralized token for the community',
+  })
+  description?: string;
+
+  @ApiProperty({
+    description: 'Related links for the token',
+    type: [AssetLinkDto],
+  })
+  links?: AssetLinkDto[];
+
   @ApiProperty({
     description: 'Array of price data points for the asset',
     type: PriceDataPoint,

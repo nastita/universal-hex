@@ -16,4 +16,17 @@ export class AssetsPrismaRepository implements AssetsRepository {
       },
     });
   }
+
+  async getAssetByAddress(
+    contractAddress: string,
+  ): Promise<AssetWithLinks | null> {
+    return this.prisma.asset.findUnique({
+      where: {
+        contractAddress,
+      },
+      include: {
+        links: true,
+      },
+    });
+  }
 }

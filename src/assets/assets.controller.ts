@@ -16,7 +16,7 @@ import {
 import {
   AssetDataDto,
   AssetDataWithPriceInfoDto,
-  AssetWithPriceDataPoints,
+  AssetDataExtrasDto,
 } from './assets.dto';
 
 @ApiTags('assets')
@@ -64,7 +64,7 @@ export class AssetsController {
   @ApiResponse({
     status: 200,
     description: 'Asset data retrieved successfully',
-    type: AssetWithPriceDataPoints,
+    type: AssetDataExtrasDto,
   })
   @ApiResponse({
     status: 404,
@@ -75,7 +75,7 @@ export class AssetsController {
     address: string,
     @Query('range')
     range: '24h' | '1w' | '1m' | '3m' | '6m' | '1y' = '24h',
-  ): Promise<AssetWithPriceDataPoints> {
+  ): Promise<AssetDataExtrasDto> {
     const assetData = await this.assetsService.getAssetData(address, range);
     if (!assetData) {
       throw new NotFoundException('Asset not found');
