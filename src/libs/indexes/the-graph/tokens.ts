@@ -94,6 +94,15 @@ export const getTokenWithTokenDayDatasQuery = gql`
       volume
       volumeUSD
     }
+    currentPrice: tokenHourDatas(
+      first: 1
+      orderBy: periodStartUnix
+      orderDirection: desc
+      where: { token: $contractAddress }
+    ) {
+      periodStartUnix
+      priceUSD
+    }
     priceDataPoints: tokenDayDatas(
       first: $numberOfDays
       orderBy: date

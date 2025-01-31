@@ -12,7 +12,10 @@ import {
 import { AssetsRepository } from '../libs/data/interfaces/assets.repository.interface';
 import { ConfigService } from '@nestjs/config';
 import { LoggerService } from '../libs/logger/logger.service';
-import { AssetDataWithPriceInfoDto, AssetDataExtrasDto } from './assets.dto';
+import {
+  AssetDataWith24hPriceChangeDto,
+  AssetDataExtrasDto,
+} from './assets.dto';
 import {
   TokensQueryResponse,
   TokenWithDailyPriceDataPointsResponse,
@@ -34,7 +37,7 @@ export class AssetsService {
     );
   }
 
-  async getAssetsData(): Promise<AssetDataWithPriceInfoDto[]> {
+  async getAssetsData(): Promise<AssetDataWith24hPriceChangeDto[]> {
     const assets = await this.assetsRepository.getAssets();
     const contractAddresses = assets.map((asset) =>
       asset.contractAddress.toLocaleLowerCase(),
@@ -87,7 +90,7 @@ export class AssetsService {
         return;
       }
 
-      const assetData: AssetDataWithPriceInfoDto = {
+      const assetData: AssetDataWith24hPriceChangeDto = {
         ...token,
         icon: asset.iconUrl ?? undefined,
         priceUSD: currentTokenHourDataPrice,
@@ -122,6 +125,10 @@ export class AssetsService {
   async getAssetDataWith24hPriceDataPoints(
     contractAddress: string,
   ): Promise<AssetDataExtrasDto | undefined> {
+    const asset =
+      await this.assetsRepository.getAssetByAddress(contractAddress);
+    if (!asset) return undefined;
+
     const response = await request<TokenWithHourlyPriceDataPointsResponse>(
       this.apiUrl,
       getTokenWith24hTokenHourDatasQuery,
@@ -129,15 +136,11 @@ export class AssetsService {
         contractAddress: contractAddress.toLocaleLowerCase(),
       },
     );
-
-    const asset =
-      await this.assetsRepository.getAssetByAddress(contractAddress);
-    if (!asset || !response.token) {
-      return undefined;
-    }
+    if (!response.token) return undefined;
 
     return {
       ...response.token,
+      priceUSD: response.priceDataPoints[0].priceUSD,
       icon: asset.iconUrl ?? undefined,
       description: asset.description ?? undefined,
       links: asset.links,
@@ -152,6 +155,10 @@ export class AssetsService {
     contractAddress: string,
     range: '1w' | '1m' | '3m' | '6m' | '1y',
   ): Promise<AssetDataExtrasDto | undefined> {
+    const asset =
+      await this.assetsRepository.getAssetByAddress(contractAddress);
+    if (!asset) return undefined;
+
     const daysInRange = {
       '1w': 7,
       '1m': 30,
@@ -169,15 +176,11 @@ export class AssetsService {
         numberOfDays,
       },
     );
-
-    const asset =
-      await this.assetsRepository.getAssetByAddress(contractAddress);
-    if (!asset || !response.token) {
-      return undefined;
-    }
+    if (!response.token) return undefined;
 
     return {
       ...response.token,
+      priceUSD: response.currentPrice[0].priceUSD,
       icon: asset.iconUrl ?? undefined,
       description: asset.description ?? undefined,
       links: asset.links,

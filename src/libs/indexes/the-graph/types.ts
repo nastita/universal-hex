@@ -64,6 +64,7 @@ export interface TokenWithPriceDataPoints {
 
 export interface TokenWithDailyPriceDataPointsResponse {
   token: TokenData;
+  currentPrice: HourlyPriceDataPoint[];
   priceDataPoints: DailyPriceDataPoint[];
 }
 

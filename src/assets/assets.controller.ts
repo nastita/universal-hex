@@ -15,7 +15,7 @@ import {
 } from '@nestjs/swagger';
 import {
   AssetDataDto,
-  AssetDataWithPriceInfoDto,
+  AssetDataWith24hPriceChangeDto,
   AssetDataExtrasDto,
 } from './assets.dto';
 
@@ -36,7 +36,7 @@ export class AssetsController {
     isArray: true,
   })
   @Get()
-  async getAssets(): Promise<AssetDataWithPriceInfoDto[]> {
+  async getAssets(): Promise<AssetDataWith24hPriceChangeDto[]> {
     return await this.assetsService.getAssetsData();
   }
 

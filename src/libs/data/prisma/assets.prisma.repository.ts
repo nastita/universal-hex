@@ -20,9 +20,13 @@ export class AssetsPrismaRepository implements AssetsRepository {
   async getAssetByAddress(
     contractAddress: string,
   ): Promise<AssetWithLinks | null> {
-    return this.prisma.asset.findUnique({
+    // TODO: Maybe addresses should always be lowercase in db to avoid this
+    return this.prisma.asset.findFirst({
       where: {
-        contractAddress,
+        contractAddress: {
+          equals: contractAddress,
+          mode: 'insensitive',
+        },
       },
       include: {
         links: true,

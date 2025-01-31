@@ -93,14 +93,15 @@ export class AssetDataDto {
     example: '1500000.50',
   })
   volumeUSD: string;
-}
 
-export class AssetDataWithPriceInfoDto extends AssetDataDto {
   @ApiProperty({
     description: 'Current price of the asset in USD',
     example: '0.324156',
   })
   priceUSD: string;
+}
+
+export class AssetDataWith24hPriceChangeDto extends AssetDataDto {
   @ApiProperty({
     description: '24-hour price change percentage',
     example: '5.67',
