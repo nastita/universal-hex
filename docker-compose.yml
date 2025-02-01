@@ -1,15 +1,41 @@
-version: '3.8'
-
 services:
+  # frontend:
+  #   build:
+  #     context: https://github.com/nastita/universal-hex-frontend.git
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - backend
+  #   environment:
+  #     - NEXT_PUBLIC_HEX_API_URL=http://localhost:8000
+  #   command: npm run dev
+
+  backend:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=development
+      - PORT=8000
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/universal-hex
+      - THE_GRAPH_API_KEY=1bb8ba6dbba0733957204b63f0b62d60
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run start:dev
+    depends_on:
+      - postgres
+
   postgres:
     image: postgres:16
     container_name: universal-hex-db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: universal-hex
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=universal-hex
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
