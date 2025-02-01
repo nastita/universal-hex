@@ -8,11 +8,11 @@ Universal HEX API is a backend service for the Hybrid Exchange for Universal Ass
 
 ### Current Features
 - Get indexed Universal Assets data from [The Graph Aerodrome Base Subgraph](https://thegraph.com/explorer/subgraphs/GENunSHWLBXm59mBSgPzQ8metBEp9YDfdqwFr91Av1UM)
-- Process the data and return it in a structured format to be consumed by the universal hex frontend
+- Process the data and return it in a structured format to be consumed by the [Universal Hex Frontend](https://github.com/nastita/universal-hex-frontend) 
 
 ### To dos & Improvements
 - Deploy API to a cloud provider (maybe render free tier or something similar) to make it easier check out
-- Add quotes functionality
+- Add quotes feature
 - Add chain info to the assets, its currently on db but not propagated to through the services
 - The subgraph we are using seems not to be tracking all the assets. Switching the indexing solution or perhaps implementing a custom indexing solution would be good.
 - Implement a caching layer to reduce the number of requests to the subgraph
@@ -39,7 +39,7 @@ $ pnpm install
 
 4. Start the database:
 ```bash
-$ docker-compose up -d
+$ docker-compose up postgres -d
 ```
 
 ## Database Management
