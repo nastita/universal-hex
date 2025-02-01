@@ -2,6 +2,8 @@
 
 # Universal HEX API
 
+![Universal Hex Swagger](/docs/assets/swagger.png)
+
 ## Description
 
 Universal HEX API is a backend service for the Hybrid Exchange for Universal Assets. It provides a robust API infrastructure to manage and track cross-chain assets, their relationships, and associated metadata.
