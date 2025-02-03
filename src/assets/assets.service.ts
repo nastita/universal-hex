@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { request } from 'graphql-request';
+import { Client, cacheExchange, fetchExchange } from '@urql/core';
 import {
   AERODROME_BASE_FULL_SUBGRAPH_ID,
   createTheGraphSubgraphUrl,
@@ -24,17 +24,21 @@ import {
 
 @Injectable()
 export class AssetsService {
-  private apiUrl: string;
+  private client: Client;
 
   constructor(
     private readonly logger: LoggerService,
     private readonly config: ConfigService,
     private readonly assetsRepository: AssetsRepository,
   ) {
-    this.apiUrl = createTheGraphSubgraphUrl(
+    const apiUrl = createTheGraphSubgraphUrl(
       this.config.get<string>('THE_GRAPH_API_KEY')!, // Already validated in ConfigModule
       AERODROME_BASE_FULL_SUBGRAPH_ID,
     );
+    this.client = new Client({
+      url: apiUrl,
+      exchanges: [cacheExchange, fetchExchange],
+    });
   }
 
   async getAssetsData(): Promise<AssetDataWith24hPriceChangeDto[]> {
@@ -51,16 +55,16 @@ export class AssetsService {
       `Querying assets from The Graph for addresses: ${contractAddresses.join(', ')}`,
     );
 
-    const response = await request<TokensQueryResponse>(
-      this.apiUrl,
-      getTokensQuery,
-      {
+    const { data: response } = await this.client
+      .query<TokensQueryResponse>(getTokensQuery, {
         contractAddresses,
         timestampHourAgo,
         timestamp24hAgo,
         timestamp25hAgo,
-      },
-    );
+      })
+      .toPromise();
+
+    if (!response) return [];
 
     this.logger.debug(
       `Received response from The Graph: ${JSON.stringify(response)}`,
@@ -129,14 +133,16 @@ export class AssetsService {
       await this.assetsRepository.getAssetByAddress(contractAddress);
     if (!asset) return undefined;
 
-    const response = await request<TokenWithHourlyPriceDataPointsResponse>(
-      this.apiUrl,
-      getTokenWith24hTokenHourDatasQuery,
-      {
-        contractAddress: contractAddress.toLocaleLowerCase(),
-      },
-    );
-    if (!response.token) return undefined;
+    const { data: response } = await this.client
+      .query<TokenWithHourlyPriceDataPointsResponse>(
+        getTokenWith24hTokenHourDatasQuery,
+        {
+          contractAddress: contractAddress.toLocaleLowerCase(),
+        },
+      )
+      .toPromise();
+
+    if (!response) return undefined;
 
     return {
       ...response.token,
@@ -168,15 +174,17 @@ export class AssetsService {
     };
 
     const numberOfDays: number = daysInRange[range];
-    const response = await request<TokenWithDailyPriceDataPointsResponse>(
-      this.apiUrl,
-      getTokenWithTokenDayDatasQuery,
-      {
-        contractAddress: contractAddress.toLocaleLowerCase(),
-        numberOfDays,
-      },
-    );
-    if (!response.token) return undefined;
+    const { data: response } = await this.client
+      .query<TokenWithDailyPriceDataPointsResponse>(
+        getTokenWithTokenDayDatasQuery,
+        {
+          contractAddress: contractAddress.toLocaleLowerCase(),
+          numberOfDays,
+        },
+      )
+      .toPromise();
+
+    if (!response) return undefined;
 
     return {
       ...response.token,
