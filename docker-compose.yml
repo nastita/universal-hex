@@ -1,14 +1,13 @@
 services:
-  # frontend:
-  #   build:
-  #     context: https://github.com/nastita/universal-hex-frontend.git
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - backend
-  #   environment:
-  #     - NEXT_PUBLIC_HEX_API_URL=http://localhost:8000
-  #   command: npm run dev
+  frontend:
+    build:
+      context: https://github.com/nastita/universal-hex-frontend.git
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_HEX_API_URL=http://localhost:8000
 
   backend:
     build:
@@ -38,6 +37,21 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migration:
+    build:
+      context: .
+    command: sh -c "npx prisma migrate deploy && npm run seed"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/universal-hex
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:
