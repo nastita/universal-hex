@@ -20,6 +20,22 @@ Universal HEX API is a backend service for the Hybrid Exchange for Universal Ass
 - Implement a caching layer to reduce the number of requests to the subgraph
 - Stop relying on coingecko images, upload token images somewhere
 
+## Docker compose
+
+To run the project using Docker Compose, follow these steps:
+
+1. Clone the repository
+2. Navigate to the project directory
+3. Run the following command:
+```bash
+$ docker-compose up -d
+```
+
+This will start the PostgreSQL database, run the migrations, seed the database, and start the backend and frontend services.
+
+- Visit ``http://localhost:8000/api`` to access the API.
+- Visit ``http://localhost:3000`` to access the frontend.
+
 ## Project setup
 
 1. Clone the repository
